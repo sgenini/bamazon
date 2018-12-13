@@ -25,6 +25,7 @@ function start(){
     console.log("\nItems available for sale:")
     connection.query("SELECT * FROM products", function(err,res){
         if(err) throw err;
+        table.length = 0;
         for (var i = 0; i < res.length; i++){
             table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity]);
         }
