@@ -3,8 +3,7 @@ var inquirer = require("inquirer");
 var Table = require("cli-table");
 
 var table = new Table({
-    head: ['Item ID', 'Name of Product', 'Department', 'Price per Unit ($)', 'Quantity in Stock']
-    // , colWidths: [100, 500, 500, 200, 100]
+    head: ['Item ID', 'Name of Product', 'Department', 'Price per Unit ($)', 'Quantity in Stock', 'Product Sales']
 });
 
 var connection = mysql.createConnection({
@@ -74,7 +73,7 @@ function viewProducts(){
         if(err) throw err;
         table.length = 0;
         for (var i = 0; i < res.length; i++){
-            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity]);
+            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity, res[i].product_sales.toFixed(2)]);
         }
         console.log(table.toString() + "\n");
         reRun();
@@ -83,11 +82,11 @@ function viewProducts(){
 
 function viewLowInventory(){
     console.log("\nItems with low quantities:")
-    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function(err,res){
+    connection.query("SELECT * FROM products WHERE stock_quantity < 10", function(err,res){
         if(err) throw err;
         table.length = 0;
         for (var i = 0; i < res.length; i++){
-            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity]);
+            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity, res[i].product_sales.toFixed(2)]);
         }
         console.log(table.toString() + "\n");
         reRun();
@@ -101,7 +100,7 @@ function addInventory() {
         if(err) throw err;
         table.length = 0;
         for (var i = 0; i < res.length; i++){
-            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity]);
+            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity, res[i].product_sales.toFixed(2)]);
         }
         console.log(table.toString() + "\n");
     inquirer
@@ -186,7 +185,8 @@ function addProduct() {
             product_name: answer.productName,
             department_name: answer.productDepartment,
             price: answer.productPrice,
-            stock_quantity: answer.productQuantity
+            stock_quantity: answer.productQuantity,
+            product_sales: 0
         }
         );
         console.log("Product successfully added.");

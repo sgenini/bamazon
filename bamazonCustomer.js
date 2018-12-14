@@ -3,8 +3,7 @@ var inquirer = require("inquirer");
 var Table = require("cli-table");
 
 var table = new Table({
-    head: ['Item ID', 'Name of Product', 'Department', 'Price per Unit ($)', 'Quantity in Stock']
-    // , colWidths: [100, 500, 500, 200, 100]
+    head: ['Item ID', 'Name of Product', 'Department', 'Price per Unit ($)', 'Quantity in Stock', 'Product Sales']
 });
 
 var connection = mysql.createConnection({
@@ -27,7 +26,7 @@ function start(){
         if(err) throw err;
         table.length = 0;
         for (var i = 0; i < res.length; i++){
-            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity]);
+            table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity, res[i].product_sales]);
         }
         console.log(table.toString());
         prompt();
@@ -71,7 +70,8 @@ function prompt() {
                 else {
                     console.log("Transaction Complete! Your total comes out to $" + (res[0].price * answer.quantity).toFixed(2));
                     connection.query("UPDATE products SET ? WHERE ?", [
-                        { stock_quantity: res[0].stock_quantity -= answer.quantity },
+                        { stock_quantity: res[0].stock_quantity -= answer.quantity,
+                            product_sales: res[0].product_sales += (res[0].price * answer.quantity) },
                         { item_id: answer.itemID }], function(err, res){
                             console.log("Stock quantities updated!");
                             reRun();
